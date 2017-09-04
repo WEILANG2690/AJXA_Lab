@@ -9,7 +9,7 @@
 
 </head>
 <body>
-<div class="container">
+	<div class="container">
 		<nav class="navbar navbar-default">
 			<div class="container-fluid">
 				<!-- Brand and toggle get grouped for better mobile display -->
@@ -63,7 +63,7 @@
 								<li><a href="RssReader.html">RSS閱讀器</a></li>
 								<li><a href="AutoComplete.html">自動完成</a></li>
 							</ul></li>
-					
+
 					</ul>
 
 
@@ -74,7 +74,7 @@
 		</nav>
 	</div>
 	<div class="container">
-		
+
 
 		<!-- Jumbotron -->
 		<div class="jumbotron">
@@ -89,11 +89,11 @@
 				<div class="form-group">
 					<input type="text" class="form-control" id="txtSearch"
 						name="keyword" autocomplete="off">
-<!-- 				    <input type="submit" -->
-<!-- 						value="送出" class="btn btn-default btn-xs"> -->
+					<!-- 				    <input type="submit" -->
+					<!-- 						value="送出" class="btn btn-default btn-xs"> -->
 				</div>
 			</form>
-				<div id="div1"></div>
+			<div id="div1"></div>
 
 
 			<!-- 每頁不同的內容到這裡結束 -->
@@ -139,46 +139,90 @@
 	<!-- /container -->
 
 
-<script src="js/jquery-1.9.1.js"></script>
+	<script src="js/jquery-1.9.1.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 
 	<script>
-	
 		//將資料存到陣列中
-		var datas = [ "aaaaa", "bbbbb", "ccccc", "ddddd", "eeeee", "fffff",
-				"ggggg", "hhhhh", "iiiii", "jjjjj" ];
+		// 		var datas = [ "aaaaa", "bbbbb", "ccccc", "ddddd", "eeeee", "fffff",
+		// 				"ggggg", "hhhhh", "iiiii", "jjjjj" ];
 		//改呼叫 JsonSimpleDemo servlet 會回傳陣列的資料
+
+		// 		function getData() {
+		// 			show.style.display = "block";
+		// 			if (show.childNodes.length > 0) {
+		// 				show.removeChild(show.childNodes[0]);
+		// 			}
+		// 			var eleDiv = document.createElement("div");
+		// 			eleDiv.className = "list-group";
+		// 			for (var j = 0, max = datas.length; j < max; j++) {
+		// 				var txtBtn = document.createTextNode(datas[j]);
+		// 				var eleBtn = document.createElement("button");
+		// 				eleBtn.className = "list-group-item";
+		// 				eleBtn.setAttribute("type", "button");
+		// 				eleBtn.appendChild(txtBtn);
+
+		// 				eleBtn.addEventListener("click", function() {
+		// 					document.myData.keyword.value = this.firstChild.nodeValue;
+		// 					show.style.display = "none";
+		// 				}, false)
+		// 				eleDiv.appendChild(eleBtn);
+		// 			}
+		// 			show.appendChild(eleDiv);
+		// 		}
+
+		// 		var txtS = document.getElementById("txtSearch");
+		// 		txtS.addEventListener("keyup", getData, false);
+
 		var show;
 		window.addEventListener("load", init, false);
+
 		function init() {
-			var txt = document.getElementById("txtSearch");
-			txt.addEventListener("keyup", getData, false);
+			var txtS = document.getElementById("txtSearch");
+			txtS.addEventListener("keyup", getData, false);
 			show = document.getElementById("div1");
 		}
 		function getData() {
-			alert(this.value);
-			//ajax
-			
-			show.style.display = "block";
-			if (show.childNodes.length > 0) {
-				show.removeChild(show.childNodes[0]);
+			//步驟一
+			xmr = new XMLHttpRequest();
+			txtS = document.getElementById("txtSearch");
+			if (xmr != null) {
+				xmr.addEventListener("readystatechange", callback);
+				//步驟二
+				if(txtS.value.trim()!=""){
+				xmr.open('GET', 'JsonSimpleDemo?keyword=' + txtS.value);
+				console.log(txtS.value);
+				xmr.send();
+				}
+			} else {
+				alert("您的瀏覽器不支援Ajax功能!!");
 			}
-			var eleDiv = document.createElement("div");
-			eleDiv.className = "list-group";
-			for (var j = 0, max = datas.length; j < max; j++) {
-				var txtBtn = document.createTextNode(datas[j]);
-				var eleBtn = document.createElement("button");
-				eleBtn.className = "list-group-item";
-				eleBtn.setAttribute("type", "button");
-				eleBtn.appendChild(txtBtn);
 
-				eleBtn.addEventListener("click", function() {
-					document.myData.keyword.value = this.firstChild.nodeValue;
-					show.style.display = "none";
-				}, false)
-				eleDiv.appendChild(eleBtn);
+		}
+		function callback() {
+			if (xmr.readyState == 4) {
+				if (xmr.status == 200) {
+					//步驟三收到的資料是JSON字串
+					var data = xmr.responseText;
+					//使用前要先轉型成JSON物件
+					var jsd = JSON.parse(data);
+					//步驟四讀出JSON中的資料
+					for (var i = 0, max = jsd.length; i < max; i++) {
+						console.log("jsd=" + jsd);
+						var txtBtn = document.createTextNode(jsd[i]);
+						var eleBtn = document.createElement("button");
+						//eleBtn更換樣式
+						eleBtn.className = "list-group-item";
+						eleBtn.setAttribute("type", "button");
+						eleBtn.appendChild(txtBtn);
+						show.appendChild(eleBtn);
+					}
+					
+				} else {
+					alert(xmr.status + ":" + xmr.statusText);
+				}
 			}
-			show.appendChild(eleDiv);
+
 		}
 	</script>
 </body>
