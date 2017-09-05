@@ -89,7 +89,7 @@
 							<input type="text" id="username" name="name" class="form-control"
 								placeholder="請輸入姓名">
 							<div id="span1" class="input-group-addon">
-								<span class="glyphicon glyphicon-question-sign"></span>
+								<span id="span2" class="glyphicon glyphicon-question-sign"></span>
 							</div>
 						</div>
 
@@ -116,7 +116,8 @@
 				</div>
 				<div class="form-group">
 					<div class="col-lg-10 col-lg-offset-2">
-						<button type="click" class="btn btn-primary">註冊</button>
+						<button type="click" class="btn btn-primary" >註冊</button>
+						<div id="message"></div>
 					</div>
 				</div>
 			</form>
@@ -168,24 +169,48 @@
 	<script src="js/jquery-1.9.1.js"></script>
 	<script src="js/bootstrap.min.js"></script>
 	<script>
-		xmlr = new HttpRequest();
 		//呼叫AccountCheck Servlet
-		if (xmlr != null) {
-			xmlr.open("POST", "/MySite/src/AccountCheck.java");
-			xmlr.setRequestHeader("Content-Type",
-					"application/x-www-form-urlencoded");
-			xmlr.send();
-			xmlr.send("name=" + username);
-			xmlr.addEventListener("readystatechange", function callback() {
-				if (xmlr.readyState == 4)
-					if (xmlr.status == 200) {
-						var data = xmlr.responeseText;
-					}
-			})
-
-		}
 		//檢查通過後換上 glyphicon glyphicon-ok-sign 圖示
 		//檢查失敗後換上 glyphicon glyphicon-remove-sign 圖示
+
+//document.addEventListener("DOMContentLoaded",function(){
+//	window.onblur = true;
+
+//   window.addEventListener("click", check);
+    
+    document.getElementById("username").onblur=check;
+    
+    function check(){
+	var xmr = new XMLHttpRequest();
+	var name = document.getElementById("username");
+	if (xmr != null) {
+		xmr.addEventListener("readystatechange", callback);
+		xmr.open("POST", "AccountCheck");
+		xmr.setRequestHeader("Content-Type",
+				"application/x-www-form-urlencoded");
+		xmr.send("name=" + name.value);
+		console.log(name.value);
+	}
+	function callback() {
+		if (xmr.readyState == 4)
+			if (xmr.status == 200) {
+				var data = xmr.responseText;
+				var myDiv = document.getElementById("message");
+				var myspn = document.getElementById("span2");
+				if(data == ("帳號已存在 ")){
+					myspn.innerHTML="glyphicon glyphicon glyphicon-remove-sign";
+					}else if (data == ("帳號不存在 ")) {
+						myspn.innerHTML="glyphicon glyphicon-question-sign";
+					}
+
+				myDiv.innerHTML = data;
+			} else {
+				alert(xhr.status + ":" + xhr.statusText);
+			}
+	}
+}
+	
+		
 	</script>
 
 </body>
